@@ -1,3 +1,35 @@
+Note from bureado:
+
+memccp is a very useful tool, but it strips the leading / on the filenames.
+It also doesn't allow to specify a key. That makes memccp hard to use in a
+companionship scenario such as with nginx (for massively adding stuff to a
+memcached and use it from nginx)
+
+This patch adds --key to memccp and also leaves the leading / so you can
+use it in a scenario such as:
+
+#!/bin/sh
+
+BASE="/var/www/mysite"
+
+for file in `\
+  find $BASE -type f \
+    -name '*.jpg' -or \
+    -name '*.gif' -or \
+    -name '*.css' -or \
+    -name '*.png' \
+  | sed "s#$BASE##"`
+do
+  echo "Adding $file to memcached..."
+  sudo memccp --key=$file --servers=localhost $BASE$file
+done
+
+Find more (spanish) here: http://bit.ly/11c4BxB
+
+Enjoy!
+
+End of note.
+
 Hi!
 
 So what is this? It is a library in C for connecting to memcached servers
