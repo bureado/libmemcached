@@ -1,0 +1,58 @@
+Index: libmemcached-1.0.8/clients/memcp.cc
+===================================================================
+--- libmemcached-1.0.8.orig/clients/memcp.cc	2012-05-12 19:22:47.000000000 -0430
++++ libmemcached-1.0.8/clients/memcp.cc	2013-06-08 21:15:11.000000000 -0430
+@@ -46,6 +46,7 @@
+ static bool opt_buffer= false;
+ static int opt_verbose= 0;
+ static char *opt_servers= NULL;
++static char *opt_key= NULL;
+ static char *opt_hash= NULL;
+ static int opt_method= OPT_SET;
+ static uint32_t opt_flags= 0;
+@@ -185,11 +186,11 @@
+     (void)fstat(fd, &sbuf);
+ 
+     char *ptr= rindex(argv[optind], '/');
+-    if (ptr)
++    if (opt_key)
+     {
+-      ptr++;
++      ptr= opt_key;
+     }
+-    else
++    if (!ptr) 
+     {
+       ptr= argv[optind];
+     }
+@@ -300,6 +301,7 @@
+       {(OPTIONSTRING)"binary", no_argument, NULL, OPT_BINARY},
+       {(OPTIONSTRING)"username", required_argument, NULL, OPT_USERNAME},
+       {(OPTIONSTRING)"password", required_argument, NULL, OPT_PASSWD},
++      {(OPTIONSTRING)"key", optional_argument, NULL, OPT_KEY},
+       {0, 0, 0, 0},
+     };
+ 
+@@ -343,6 +345,10 @@
+       opt_servers= strdup(optarg);
+       break;
+ 
++    case OPT_KEY: /* --key */
++      opt_key= strdup(optarg);
++      break;
++
+     case OPT_FLAG: /* --flag */
+       {
+         bool strtol_error;
+Index: libmemcached-1.0.8/clients/client_options.h
+===================================================================
+--- libmemcached-1.0.8.orig/clients/client_options.h	2012-05-12 19:22:47.000000000 -0430
++++ libmemcached-1.0.8/clients/client_options.h	2013-06-08 21:14:41.000000000 -0430
+@@ -15,6 +15,7 @@
+ 
+ enum memcached_options {
+   OPT_SERVERS= 's',
++  OPT_KEY= 'k',
+   OPT_VERSION= 'V',
+   OPT_HELP= 'h',
+   OPT_VERBOSE= 'v',
